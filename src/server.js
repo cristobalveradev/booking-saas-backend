@@ -9,7 +9,7 @@ const server = express()
 
 
 //middleware
-server.use(cors());
+app.use(cors({ origin: "http://localhost:5173" }));
 server.use(express.json());
 
 server.listen(port,()=>{
