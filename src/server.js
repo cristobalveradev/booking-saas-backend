@@ -19,19 +19,5 @@ server.listen(port,()=>{
     console.log("Server started and listening in port " + port)
 })
 
-server.get("/", (req,res)=> {
-    res.send("Server working")
-})
-
-
-server.get("/test-db", async(req,res) => {
-    try{
-        const result = await pool.query("SELECT NOW()");
-        res.json(result.rows);
-    }catch(err){
-        console.error(err);
-        res.status(500).send("DB error")
-    }
-})
 
 
