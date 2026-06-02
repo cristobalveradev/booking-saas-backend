@@ -3,13 +3,22 @@ const pool = require("../config/db");
 const createService = async (req, res) => {
     try{
         const {name, duration} = req.body;
+        if(!name || !duration){
+            return res.status(400).json({message:"Invalid credentials"})
+        }
+        
         const {user} = req;
         const {userId} = user;
         const newService = await pool.query("INSERT INTO services (name, duration, user_id) VALUES ($1, $2, $3 ) RETURNING *", [name, duration, userId])
-        console.log(newService.rows)
-        res.status(201).json(newService.rows[0])
+        
+        
+        
+        return res.status(201).json(newService.rows[0])
     } catch(err){
-
+        if (err.code == "23505"){
+            return res.status(409).json({message:"Service and Duration already exists!"})
+        }
+        return res.status(500).json({message:"Server error"})
     }
 }
 
