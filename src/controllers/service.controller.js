@@ -39,4 +39,19 @@ const getServices = async (req, res) => {
     }
 }
 
-module.exports = {createService, getServices}
+
+const deleteService = async (req, res) => {
+    try{
+    const {serviceId} = req.body
+        const deletedService = await pool.query("DELETE FROM services WHERE id = $1", [serviceId])
+        if(deletedService.rowCount === 0){
+            return res.status(404).json({message:"Service not found or unauthorized"})
+        }
+        return res.status(200).json({message:"Service deleted"})
+    } catch(err){
+        return res.status(500).json({message:"Internal server error"})
+    }   
+}
+
+
+module.exports = {createService, getServices, deleteService}
