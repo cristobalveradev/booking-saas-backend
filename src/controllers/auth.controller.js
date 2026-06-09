@@ -4,10 +4,10 @@ const jwt = require("jsonwebtoken");
 
 const register = async (req, res) => {
     try{
-        const {email, password} = req.body;
+        const {email, password, name} = req.body;
 
         // 1. basic Validation
-        if(!email || !password){
+        if(!email || !password || !name){
             return res.status(400).json({message:"Missing FIelds"});
         }
 
@@ -26,12 +26,15 @@ const register = async (req, res) => {
 
         // 4. insert user
         const newUser = await pool.query(
-            "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email",
-            [email, hashedPassword]
+            "INSERT INTO users (email, password_hash, name) VALUES ($1, $2, $3) RETURNING id, email, name",
+            [email, hashedPassword, name]
         )
 
         // 5. response
-        res.status(201).json(newUser.rows[0]);
+        res.status(201).json({
+            user:newUser.rows[0], 
+            message: "User created"
+        });
     }catch(err){
         console.error(err);
         res.status(500).json({"message": "Server error"})
@@ -62,14 +65,21 @@ const login = async (req,res) => {
         }
 
         // 3. Generate token
-
+        
         const token = jwt.sign(
-            {userId:user.rows[0].id},
-            process.env.JWT_SECRET,
-            {expiresIn:"1d"}
+            {
+                userId:user.rows[0].id},
+                process.env.JWT_SECRET,
+                {expiresIn:"1d"}
         );
 
-        res.json({token})
+        res.json({
+            token,
+            user:{
+                id: user.rows[0].id,
+                name: user.rows[0].name
+            }
+        })
         
     } catch(err){
         console.error(err)

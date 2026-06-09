@@ -13,7 +13,7 @@ const createService = async (req, res) => {
         
         
         
-        return res.status(201).json(newService.rows[0])
+        return res.status(201).json({service:newService.rows[0]})
     } catch(err){
         if (err.code == "23505"){
             return res.status(409).json({message:"Service and Duration already exists!"})
@@ -25,8 +25,7 @@ const createService = async (req, res) => {
 const getServices = async (req, res) => {
     // 1. Get userId fron token params 
     try{
-        const userId = req.user.userId;
-
+        const userId = req.params.id;
         // 2. Make query and save response
         
         const services = await pool.query("SELECT * FROM services WHERE user_id = $1", [userId])
